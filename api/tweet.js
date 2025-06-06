@@ -1,14 +1,14 @@
-import chromium from '@sparticuz/chromium-min';
-import puppeteer from 'puppeteer-core';
-import { getTweet } from 'react-tweet/api';
-import { renderToString } from 'react-dom/server';
-import { EmbeddedTweet } from 'react-tweet';
+import chromium from "@sparticuz/chromium-min";
+import puppeteer from "puppeteer-core";
+import { getTweet } from "react-tweet/api";
+import { renderToString } from "react-dom/server";
+import { EmbeddedTweet } from "react-tweet";
 
 // Load the Twitter theme CSS
-import tweetStyles from 'react-tweet/theme.css';
+import tweetStyles from "react-tweet/theme.css";
 
 export const config = {
-  runtime: 'edge',
+  runtime: "edge",
 };
 
 async function generateTweetImage(tweet) {
@@ -43,7 +43,7 @@ async function generateTweetImage(tweet) {
 
   // Take screenshot
   const screenshot = await page.screenshot({
-    type: 'png',
+    type: "png",
     omitBackground: true,
   });
 
@@ -54,34 +54,34 @@ async function generateTweetImage(tweet) {
 export default async function handler(req) {
   try {
     const { searchParams } = new URL(req.url);
-    const tweetId = searchParams.get('id');
-    const format = searchParams.get('format')?.toLowerCase();
+    const tweetId = searchParams.get("id");
+    const format = searchParams.get("format")?.toLowerCase();
 
     if (!tweetId) {
-      return new Response('Missing tweet ID', { status: 400 });
+      return new Response("Missing tweet ID", { status: 400 });
     }
 
     const tweet = await getTweet(tweetId);
 
     // Return JSON if format is not 'image'
-    if (format !== 'image') {
+    if (format !== "image") {
       return new Response(JSON.stringify(tweet), {
-        headers: { 'Content-Type': 'application/json' },
+        headers: { "Content-Type": "application/json" },
       });
     }
 
     // Generate and return image
     const image = await generateTweetImage(tweet);
     return new Response(image, {
-      headers: { 
-        'Content-Type': 'image/png',
-        'Cache-Control': 'public, max-age=3600'
+      headers: {
+        "Content-Type": "image/png",
+        "Cache-Control": "public, max-age=3600",
       },
     });
   } catch (error) {
     return new Response(JSON.stringify({ error: error.message }), {
       status: 500,
-      headers: { 'Content-Type': 'application/json' },
+      headers: { "Content-Type": "application/json" },
     });
   }
-} 
+}
